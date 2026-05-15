@@ -1,18 +1,14 @@
+//import { useUserSync } from "@/hooks/useUserSync";
 import { useAuth } from "@clerk/expo";
-import { Redirect } from "expo-router";
-import React from "react";
+import { Redirect, Slot } from "expo-router";
 
 export default function RootLayout() {
   const { isSignedIn, isLoaded } = useAuth();
 
-  // sync clerk auth -> supabase
+  // useUserSync();
 
-  if (!isLoaded) {
-    return null;
-  }
-  if (!isSignedIn) {
-    return <Redirect href="/sign-in" />;
-  }
+  if (!isLoaded) return null;
+  if (!isSignedIn) return <Redirect href="/sign-in" />;
 
-  return <Redirect href="/(root)/(tabs)" />;
+  return <Slot />;
 }
