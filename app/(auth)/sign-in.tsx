@@ -1,21 +1,226 @@
-import { useRouter } from "expo-router";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useAuth, useSignIn } from "@clerk/expo";
+import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-export default function SignIN() {
+export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+
+  const { signIn, errors, fetchStatus } = useSignIn();
+  const { isSignedIn } = useAuth();
   const router = useRouter();
 
-  return (
-    <View className="flex-1 items-center justify-center gap-5">
-      <Text className="font-bold text-lg">SignIN</Text>
-      <TouchableOpacity
-        onPress={() => router.push("/(auth)/sign-up")}
-        className="bg-black px-5 py-3 rounded-lg"
-      >
-        <Text className="text-white text-bold text-xl text-center">
-          Sign up
+  const handleSignInPress = async () => {
+    const { error } = await signIn.password({
+      emailAddress: email,
+      password,
+    });
+    if (signIn.status === "complete") {
+      signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            console.log(session.currentTask);
+            return;
+          }
+          const url = decorateUrl("/");
+          if (Platform.OS === "web" && url.startsWith("http")) {
+            window.location.href = url;
+          } else {
+            router.push(url as any);
+          }
+        },
+      });
+    } else if (signIn.status === "needs_second_factor") {
+      await signIn.mfa.sendPhoneCode();
+    } else if (signIn.status === "needs_client_trust") {
+      const trustFactor = signIn.supportedSecondFactors.find(
+        (factor) => factor.strategy === "email_code",
+      );
+      if (trustFactor) {
+        await signIn.mfa.sendEmailCode();
+      } else {
+        console.error("No supported second factor found for client trust.");
+      }
+    } else if (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleVerifyPress = async () => {
+    if (signIn.status === "needs_second_factor") {
+      await signIn.mfa.verifyPhoneCode({
+        code,
+      });
+    } else {
+      await signIn.mfa.verifyEmailCode({
+        code,
+      });
+    }
+    if (signIn.status === "complete") {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            console.log(session.currentTask);
+            return;
+          }
+          const url = decorateUrl("/");
+          if (Platform.OS === "web" && url.startsWith("http")) {
+            window.location.href = url;
+          } else {
+            router.push(url as any);
+          }
+        },
+      });
+    } else {
+      console.error("Verify attempt not complete:", signIn);
+    }
+  };
+
+  if (signIn.status === "needs_client_trust") {
+    return (
+      <View className="flex-1 justify-center gap-3 px-6 py-12">
+        <Image
+          source={require("../../assets/images/kribb.png")}
+          resizeMode="contain"
+          style={{
+            width: 80,
+            height: 80,
+          }}
+        />
+        <Text className="text-3xl font-bold text-gray-900">Verify Account</Text>
+        <Text className="text-xl font-semibold text-gray-500">
+          We emailed you the code at {email}.
         </Text>
-      </TouchableOpacity>
-    </View>
+        <TextInput
+          className="w-full border-2 border-gray-600 rounded-lg p-3 text-gray-700"
+          placeholder="Enter code"
+          placeholderTextColor={"#58616f"}
+          value={code}
+          onChangeText={setCode}
+          autoCapitalize="none"
+          keyboardType="number-pad"
+        />
+        {errors.fields.code?.message && (
+          <Text className="text-red-500">{errors.fields.code.message}</Text>
+        )}
+        <TouchableOpacity
+          className="w-full bg-blue-600 py-3 rounded-lg"
+          disabled={fetchStatus === "fetching"}
+          onPress={handleVerifyPress}
+        >
+          {fetchStatus === "fetching" ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text className="text-white text-center text-lg font-semibold">
+              Verify
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <View className="flex-row justify-center mt-2">
+          <Text
+            onPress={() => signIn.mfa.sendEmailCode()}
+            className="text-blue-600"
+          >
+            Send code again.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (signIn.status === "complete" || isSignedIn) {
+    return null;
+  }
+
+  return (
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      className="bg-white"
+      keyboardShouldPersistTaps="handled"
+    >
+      <View className="flex-1 justify-center px-6 py-12">
+        <Image
+          source={require("../../assets/images/kribb.png")}
+          resizeMode="contain"
+          style={{
+            width: 80,
+            height: 80,
+            marginBottom: 12,
+          }}
+        />
+        <Text className="text-3xl font-bold text-gray-900">Welcome Back</Text>
+        <Text className="text-xl text-gray-500 font-semibold mb-3">
+          Sign in to your account
+        </Text>
+
+        <TextInput
+          className="w-full border-2 border-gray-600 rounded-lg p-3 text-gray-700 mb-3"
+          placeholder="Email"
+          placeholderTextColor={"#58616f"}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+
+        {errors.fields.identifier?.message && (
+          <Text className="text-red-500 mb-2">
+            {errors.fields.identifier.message}
+          </Text>
+        )}
+
+        <TextInput
+          className="w-full border-2 border-gray-600 rounded-lg p-3 text-gray-700 mb-3"
+          placeholder="Password"
+          placeholderTextColor={"#58616f"}
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+          secureTextEntry
+        />
+        {errors.fields.password?.message && (
+          <Text className="text-red-500 mb-2">
+            {errors.fields.password.message}
+          </Text>
+        )}
+        <TouchableOpacity
+          className="w-full bg-blue-600 py-3 rounded-lg"
+          disabled={fetchStatus === "fetching"}
+          onPress={handleSignInPress}
+        >
+          {fetchStatus === "fetching" ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text className="text-white text-center text-lg font-semibold">
+              Sign In
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <View className="flex-row justify-center mt-2">
+          <Text className="text-gray-700">Don&apos;t have an account? </Text>
+          <Link href="/(auth)/sign-up">
+            <Text className="text-blue-600 font-semibold">Sign Up</Text>
+          </Link>
+        </View>
+
+        <View
+          className="w-full flex-row justify-center mt-3"
+          nativeID="clerk-captcha"
+        />
+      </View>
+    </ScrollView>
   );
 }

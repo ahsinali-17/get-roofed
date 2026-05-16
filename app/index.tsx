@@ -6,7 +6,7 @@ export default function Index() {
 
   if (!isLoaded) return null;
 
-  if (isSignedIn) return <Redirect href="/(root)/(tabs)" />;
+  if (!isSignedIn) return <Redirect href="/sign-in" />;
 
-  return <Redirect href="/sign-in" />;
+  return <Redirect href="/(root)/(tabs)" />;
 }

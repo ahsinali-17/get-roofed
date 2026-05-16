@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-export default function SignOUT() {
+export default function SignUp() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,7 +73,7 @@ export default function SignOUT() {
             height: 80,
           }}
         />
-        <Text className="text-3xl font-bold text-gray-900">Create Account</Text>
+        <Text className="text-3xl font-bold text-gray-900">Verify Account</Text>
         <Text className="text-xl font-semibold text-gray-500">
           We emailed you the code at {email}.
         </Text>
@@ -210,7 +210,7 @@ export default function SignOUT() {
         </View>
 
         <View
-          className="w-full flex-row justify-center"
+          className="w-full flex-row justify-center mt-3"
           nativeID="clerk-captcha"
         />
       </View>
