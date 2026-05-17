@@ -21,73 +21,72 @@ export default function SignIn() {
   const { isSignedIn } = useAuth();
   const router = useRouter();
 
-  const handleSignInPress = async () => {
-    const { error } = await signIn.password({
-      emailAddress: email,
-      password,
+  const finalizeSignIn = async () => {
+    await signIn.finalize({
+      navigate: ({ session, decorateUrl }) => {
+        if (session?.currentTask) {
+          console.log(session.currentTask);
+          return;
+        }
+        const url = decorateUrl("/");
+        if (Platform.OS === "web" && url.startsWith("http")) {
+          window.location.href = url;
+        } else {
+          router.push(url as any);
+        }
+      },
     });
-    if (signIn.status === "complete") {
-      signIn.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            console.log(session.currentTask);
-            return;
-          }
-          const url = decorateUrl("/");
-          if (Platform.OS === "web" && url.startsWith("http")) {
-            window.location.href = url;
-          } else {
-            router.push(url as any);
-          }
-        },
+  };
+
+  const handleSignInPress = async () => {
+    try {
+      const { error } = await signIn.password({
+        emailAddress: email,
+        password,
       });
-    } else if (signIn.status === "needs_second_factor") {
-      await signIn.mfa.sendPhoneCode();
-    } else if (signIn.status === "needs_client_trust") {
-      const trustFactor = signIn.supportedSecondFactors.find(
-        (factor) => factor.strategy === "email_code",
-      );
-      if (trustFactor) {
-        await signIn.mfa.sendEmailCode();
-      } else {
-        console.error("No supported second factor found for client trust.");
+
+      if (error) {
+        throw error;
       }
-    } else if (error) {
-      alert(error.message);
+
+      // Check status after password attempt
+      if (signIn.status === "complete") {
+        await finalizeSignIn();
+      } else if (
+        signIn.status === "needs_second_factor" ||
+        signIn.status === "needs_client_trust"
+      ) {
+        // using email for both 2FA and client trust
+        try {
+          await signIn.mfa.sendEmailCode();
+        } catch (emailErr: any) {
+          alert(`Failed to send verification email. ${emailErr.message}`);
+        }
+      }
+    } catch (err: any) {
+      alert(err || "Sign in failed. Please try again.");
     }
   };
 
   const handleVerifyPress = async () => {
-    if (signIn.status === "needs_second_factor") {
-      await signIn.mfa.verifyPhoneCode({
-        code,
-      });
-    } else {
+    try {
       await signIn.mfa.verifyEmailCode({
         code,
       });
-    }
-    if (signIn.status === "complete") {
-      await signIn.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            console.log(session.currentTask);
-            return;
-          }
-          const url = decorateUrl("/");
-          if (Platform.OS === "web" && url.startsWith("http")) {
-            window.location.href = url;
-          } else {
-            router.push(url as any);
-          }
-        },
-      });
-    } else {
-      console.error("Verify attempt not complete:", signIn);
+
+      if (signIn.status === "complete") {
+        await finalizeSignIn();
+      }
+    } catch (err) {
+      console.error("Verification error:", err);
+      alert("Verification failed. Please try again.");
     }
   };
 
-  if (signIn.status === "needs_client_trust") {
+  if (
+    signIn.status === "needs_client_trust" ||
+    signIn.status === "needs_second_factor"
+  ) {
     return (
       <View className="flex-1 justify-center gap-3 px-6 py-12">
         <Image

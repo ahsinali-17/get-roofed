@@ -5,8 +5,8 @@ import { useSupabase } from "./useSupabase";
 
 export const useUserSync = () => {
   const { user } = useUser();
-  const { isAdmin, setIsAdmin } = useUserStore();
-  const supabase = useSupabase();
+  const setIsAdmin = useUserStore((state) => state.setIsAdmin);
+  const authSupabase = useSupabase();
 
   useEffect(() => {
     if (!user) {
@@ -16,18 +16,18 @@ export const useUserSync = () => {
   }, [user]);
 
   const syncUser = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await authSupabase
       .from("users")
       .select("is_admin")
       .eq("clerk_id", user?.id)
       .single();
-    if (error) {
-      console.error("Error fetching user data:", error);
+    if (error && error.code === "PGRST116") {
+      console.log("no rows detected; likely a new user, creating one");
     }
     if (data?.is_admin !== undefined) {
       setIsAdmin(data.is_admin);
     } else {
-      const { data: newUser } = await supabase
+      const { data: newUser } = await authSupabase
         .from("users")
         .insert({
           clerk_id: user?.id,

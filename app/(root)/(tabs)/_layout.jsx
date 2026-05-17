@@ -1,7 +1,10 @@
 import { useUserStore } from "@/store/useUserStore";
+import { FontAwesome } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { Platform } from "react-native";
 
-export default function TabLayout() {
+function IOSLayout() {
   const { isAdmin } = useUserStore();
   return (
     <NativeTabs scrollEnabled>
@@ -29,4 +32,77 @@ export default function TabLayout() {
       </NativeTabs.Trigger>
     </NativeTabs>
   );
+}
+
+function AndroidLayout() {
+  const isAdmin = useUserStore((state) => state.isAdmin);
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#0066cc",
+        tabBarInactiveTintColor: "#666",
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          borderTopColor: "#ddd",
+          borderTopWidth: 1,
+        },
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="home" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="search" size={24} color={color} />
+          ),
+        }}
+      />
+
+      {isAdmin ? (
+        <Tabs.Screen
+          name="create"
+          options={{
+            title: "Add Property",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome name="plus" size={24} color={color} />
+            ),
+          }}
+        />
+      ) : null}
+
+      <Tabs.Screen
+        name="saved"
+        options={{
+          title: "Saved",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="heart" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="user" size={24} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
+
+export default function TabLayout() {
+  return Platform.OS === "ios" ? <IOSLayout /> : <AndroidLayout />;
 }
