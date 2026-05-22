@@ -1,0 +1,102 @@
+import { formatPrice } from "@/lib/utils";
+import { PropertyType } from "@/types";
+import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+
+export default function PropertyCard({
+  property,
+  onUnsave,
+  showSaved,
+}: {
+  property: PropertyType;
+  onUnsave?: () => void;
+  showSaved?: boolean;
+}) {
+  const router = useRouter();
+
+  const isSaved = showSaved ?? false;
+  return (
+    <TouchableOpacity
+      onPress={() => router.push(`/(root)/(tabs)`)}
+      className="flex-row items-start gap-2 relative w-full max-h-40 p-2 mb-3 rounded-2xl overflow-hidden bg-white"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 22,
+        elevation: 4,
+        opacity: property.is_sold ? 0.5 : 1,
+      }}
+    >
+      <Image
+        source={
+          property.images.length > 0
+            ? { uri: property.images[0] }
+            : require("../assets/images/kribb.png")
+        }
+        className="w-28 h-28"
+        resizeMode="cover"
+      />
+
+      <View className="absolute top-3 left-3 bg-yellow-400 rounded-2xl px-2 py-1">
+        <Text className="text-black font-semibold text-sm">
+          {property.type}
+        </Text>
+      </View>
+
+      <View className="flex justify-between flex-1 h-full">
+        <View className="flex items-start justify-center ">
+          <Text className="font-bold text-lg text-black leading-5">
+            {property.title}
+          </Text>
+          <View className="flex-row items-center justify-start gap-1">
+            <FontAwesome name="map-marker" size={14} color="gray" />
+            <Text className="text-gray-500 font-normal text-sm">
+              {property.city}
+            </Text>
+          </View>
+        </View>
+
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center justify-start gap-1">
+            <FontAwesome name="money" size={14} color="#1e40af" />
+            <Text className="text-blue-800 font-bold text-sm">
+              {formatPrice(property.price)}
+            </Text>
+          </View>
+
+          <View className="flex-row items-center justify-end gap-3">
+            <View className="flex-row items-center justify-start gap-1">
+              <FontAwesome name="bed" size={14} color="gray" />
+              <Text className="text-gray-500 font-normal text-sm">
+                {property.bedrooms}
+              </Text>
+            </View>
+            <View className="flex-row items-center justify-start gap-1">
+              <FontAwesome name="area-chart" size={14} color="gray" />
+              <Text className="text-gray-500 font-normal text-sm">
+                {property.area_sqft}
+              </Text>
+            </View>
+          </View>
+
+          {property.is_sold && (
+            <View className=" bg-red-500 rounded-2xl px-2 py-1">
+              <Text className="text-white font-semibold text-sm">Sold</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <TouchableOpacity onPress={() => onUnsave && onUnsave()}>
+        <FontAwesome
+          name={isSaved ? "heart" : "heart-o"}
+          size={18}
+          color={showSaved ? "#e11d48" : "gray"}
+        />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+}
