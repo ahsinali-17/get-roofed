@@ -1,5 +1,5 @@
 import { formatPrice } from "@/lib/utils";
-import { PropertyType } from "@/types";
+import { Property } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -10,7 +10,7 @@ export default function PropertyCard({
   onUnsave,
   showSaved,
 }: {
-  property: PropertyType;
+  property: Property;
   onUnsave?: () => void;
   showSaved?: boolean;
 }) {
@@ -19,8 +19,8 @@ export default function PropertyCard({
   const isSaved = showSaved ?? false;
   return (
     <TouchableOpacity
-      onPress={() => router.push(`/(root)/(tabs)`)}
-      className="flex-row items-start gap-2 relative w-full max-h-40 p-2 mb-3 rounded-2xl overflow-hidden bg-white"
+      onPress={() => router.push(`/(root)/property/${property.id}`)}
+      className="flex-row items-start gap-2 w-full max-h-40 p-2 mb-3 rounded-2xl overflow-hidden bg-white"
       style={{
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },

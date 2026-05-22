@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
-type PropertyType = "house" | "apartment" | "villa" | "studio" | "null";
+export type PropertyType = "house" | "apartment" | "villa" | "studio" | null;
 
 interface SearchState {
-  searchQuery: string | null;
+  searchQuery: string;
   setSearchQuery: (query: string) => void;
   propertyType: PropertyType;
   setPropertyType: (type: PropertyType) => void;
@@ -17,9 +17,9 @@ interface SearchState {
 }
 
 export const useSearchStore = create<SearchState>((set) => ({
-  searchQuery: null,
+  searchQuery: "",
   setSearchQuery: (query) => set({ searchQuery: query }),
-  propertyType: "null",
+  propertyType: null,
   setPropertyType: (type) => set({ propertyType: type }),
   minPrice: null,
   setMinPrice: (price) => set({ minPrice: price }),
@@ -29,8 +29,8 @@ export const useSearchStore = create<SearchState>((set) => ({
   setBedrooms: (bedrooms) => set({ bedrooms }),
   resetFilters: () =>
     set({
-      searchQuery: null,
-      propertyType: "null",
+      searchQuery: "",
+      propertyType: null,
       minPrice: null,
       maxPrice: null,
       bedrooms: null,

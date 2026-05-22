@@ -1,7 +1,7 @@
 import FeaturedCard from "@/components/FeaturedCard";
 import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/lib/Supabase";
-import { PropertyType } from "@/types/index";
+import { Property } from "@/types/index";
 import { useUser } from "@clerk/expo";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -19,8 +19,8 @@ export default function Home() {
   const router = useRouter();
   const { user } = useUser();
 
-  const [featured, setFeatured] = useState<PropertyType[]>([]);
-  const [recommended, setRecommended] = useState<PropertyType[]>([]);
+  const [featured, setFeatured] = useState<Property[]>([]);
+  const [recommended, setRecommended] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProperties = async () => {

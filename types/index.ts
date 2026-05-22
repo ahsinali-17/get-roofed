@@ -1,4 +1,4 @@
-export interface PropertyType {
+export interface Property {
   id: string;
   title: string;
   description: string;
