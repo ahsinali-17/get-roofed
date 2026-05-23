@@ -6,7 +6,8 @@ import { formatPrice } from "@/lib/utils";
 import { useSearchStore } from "@/store/searchStore";
 import { Property } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Text,
@@ -28,6 +29,8 @@ export default function Search() {
     setBedrooms,
     setPropertyType,
   } = useSearchStore();
+
+  const { openFilters }: { openFilters?: string } = useLocalSearchParams();
 
   const [showFilters, setShowFilters] = useState(false);
   const [results, setResults] = useState<Property[]>([]);
@@ -63,6 +66,14 @@ export default function Search() {
   const filterCount = [maxPrice, minPrice, bedrooms, propertyType].filter(
     Boolean,
   ).length;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (openFilters === "true") {
+        setShowFilters(true);
+      }
+    }, [openFilters]),
+  );
 
   useEffect(() => {
     fetchResults();

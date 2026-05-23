@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+import { platformSelect } from "nativewind/theme";
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
@@ -10,9 +11,12 @@ module.exports = {
         card: "#1A1A2E",
       },
       fontFamily: {
-        sans: ["Rubik_400Regular"],
-        medium: ["Rubik_500Medium"],
-        bold: ["Rubik_700Bold"],
+        example: ["ExampleFontFamily"],
+        system: platformSelect({
+          ios: "Georgia",
+          android: "sans-serif",
+          default: "ui-sans-serif",
+        }),
       },
     },
   },
