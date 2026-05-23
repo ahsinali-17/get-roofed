@@ -1,3 +1,4 @@
+import { useSaveCountStore } from "@/store/saveCountStore";
 import { useAuth } from "@clerk/expo";
 import { useEffect, useState } from "react";
 import { useSupabase } from "./useSupabase";
@@ -5,19 +6,22 @@ import { useSupabase } from "./useSupabase";
 export function useSaveProperty({
   propertyID,
   onUnsave,
+  onSave,
 }: {
   propertyID: string;
   onUnsave?: () => void;
+  onSave?: () => void;
 }) {
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
   const authSupabase = useSupabase();
   const { userId } = useAuth();
+  const { saveCount } = useSaveCountStore();
 
   useEffect(() => {
     checkIfSaved();
-  }, [userId, propertyID]);
+  }, [userId, propertyID, saveCount]);
 
   const checkIfSaved = async () => {
     if (!userId) return;
@@ -53,6 +57,7 @@ export function useSaveProperty({
         console.error("Error saving property:", insertError);
       } else {
         setIsSaved(true);
+        onSave?.();
       }
     }
     setSaveLoading(false);

@@ -1,6 +1,7 @@
 import FeaturedCard from "@/components/FeaturedCard";
 import PropertyCard from "@/components/PropertyCard";
 import { supabase } from "@/lib/Supabase";
+import { useSaveCountStore } from "@/store/saveCountStore";
 import { Property } from "@/types/index";
 import { useUser } from "@clerk/expo";
 import { FontAwesome } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import {
 export default function Home() {
   const router = useRouter();
   const { user } = useUser();
+  const saveCount = useSaveCountStore((state) => state.saveCount);
 
   const [featured, setFeatured] = useState<Property[]>([]);
   const [recommended, setRecommended] = useState<Property[]>([]);
@@ -35,6 +37,7 @@ export default function Home() {
       const { data: recommendedProperties } = await supabase
         .from("properties")
         .select("*")
+        .neq("is_featured", true)
         .order("created_at", { ascending: false });
       setRecommended(recommendedProperties ?? []);
     } catch (error) {
@@ -47,7 +50,7 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       fetchProperties();
-    }, []),
+    }, [saveCount]),
   );
 
   if (!user) {

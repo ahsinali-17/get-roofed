@@ -3,9 +3,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { PropertyType } from "../types";
+import { Property } from "../types";
 
-const FeaturedCard = ({ property }: { property: PropertyType }) => {
+const FeaturedCard = ({ property }: { property: Property }) => {
   const router = useRouter();
   return (
     <TouchableOpacity

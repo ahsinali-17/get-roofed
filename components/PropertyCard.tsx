@@ -1,4 +1,6 @@
+import { useSaveProperty } from "@/hooks/useSaveProperty";
 import { formatPrice } from "@/lib/utils";
+import { useSaveCountStore } from "@/store/saveCountStore";
 import { Property } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -15,8 +17,17 @@ export default function PropertyCard({
   showSaved?: boolean;
 }) {
   const router = useRouter();
+  const { increment } = useSaveCountStore();
+  const { isSaved, saveLoading, toggleSave } = useSaveProperty({
+    propertyID: property.id,
+    onUnsave,
+    onSave: increment,
+  });
 
-  const isSaved = showSaved ?? false;
+  if (!showSaved && isSaved) {
+    return null;
+  }
+
   return (
     <TouchableOpacity
       onPress={() => router.push(`/(root)/property/${property.id}`)}
@@ -90,11 +101,15 @@ export default function PropertyCard({
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => onUnsave && onUnsave()}>
+      <TouchableOpacity
+        onPress={toggleSave}
+        disabled={saveLoading}
+        className="absolute top-3 right-3"
+      >
         <FontAwesome
           name={isSaved ? "heart" : "heart-o"}
           size={18}
-          color={showSaved ? "#e11d48" : "gray"}
+          color={isSaved ? "#e11d48" : "gray"}
         />
       </TouchableOpacity>
     </TouchableOpacity>

@@ -1,11 +1,14 @@
+import { useSupabase } from "@/hooks/useSupabase";
+import { useSaveCountStore } from "@/store/saveCountStore";
 import { useUserStore } from "@/store/useUserStore";
+import { useAuth } from "@clerk/expo";
 import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
-import { Platform } from "react-native";
+import { useEffect } from "react";
+import { Platform, Text, View } from "react-native";
 
-function IOSLayout() {
-  const { isAdmin } = useUserStore();
+function IOSLayout({ isAdmin, saveCount }) {
   return (
     <NativeTabs scrollEnabled>
       <NativeTabs.Trigger name="index">
@@ -23,7 +26,28 @@ function IOSLayout() {
         </NativeTabs.Trigger>
       )}
       <NativeTabs.Trigger name="saved">
-        <Icon sf="heart.fill" drawable="custom_saved_drawable" />
+        <View style={{ position: "relative" }}>
+          <Icon sf="heart.fill" drawable="custom_saved_drawable" />
+          {saveCount > 0 && (
+            <View
+              style={{
+                position: "absolute",
+                right: -8,
+                top: -8,
+                backgroundColor: "#ff3333",
+                borderRadius: 12,
+                width: 24,
+                height: 24,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
+                {saveCount}
+              </Text>
+            </View>
+          )}
+        </View>
         <Label>Saved</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
@@ -34,9 +58,7 @@ function IOSLayout() {
   );
 }
 
-function AndroidLayout() {
-  const isAdmin = useUserStore((state) => state.isAdmin);
-
+function AndroidLayout({ isAdmin, saveCount }) {
   return (
     <Tabs
       screenOptions={{
@@ -88,8 +110,14 @@ function AndroidLayout() {
           tabBarIcon: ({ color }) => (
             <FontAwesome name="heart" size={24} color={color} />
           ),
+          tabBarBadge: saveCount > 0 ? saveCount : null,
+          badgeStyle: {
+            backgroundColor: "#ff3333",
+            color: "#fff",
+          },
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{
@@ -104,5 +132,31 @@ function AndroidLayout() {
 }
 
 export default function TabLayout() {
-  return Platform.OS === "ios" ? <IOSLayout /> : <AndroidLayout />;
+  const isAdmin = useUserStore((state) => state.isAdmin);
+  const { saveCount, setSaveCount } = useSaveCountStore();
+  const authSupabase = useSupabase();
+  const { userId } = useAuth();
+
+  const fetchSaveCount = async () => {
+    if (!userId) return;
+    const { data, error } = await authSupabase
+      .from("saved_properties")
+      .select("id", { count: "exact" })
+      .eq("user_clerk_id", userId);
+    if (error) {
+      console.error("Error fetching save count:", error);
+    } else {
+      setSaveCount(data.length);
+    }
+  };
+
+  useEffect(() => {
+    fetchSaveCount();
+  }, [userId]);
+
+  return Platform.OS === "ios" ? (
+    <IOSLayout isAdmin={isAdmin} saveCount={saveCount} />
+  ) : (
+    <AndroidLayout isAdmin={isAdmin} saveCount={saveCount} />
+  );
 }
