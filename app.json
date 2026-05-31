@@ -40,6 +40,13 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow real estate app to access your photos.",
+          "cameraPermission": "Allow real estate app to use your camera."
+        }
       ]
     ],
     "experiments": {

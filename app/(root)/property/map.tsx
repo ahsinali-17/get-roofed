@@ -1,13 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import {
-    Linking,
-    Platform,
-    Text,
-    TouchableOpacity,
-    View
-} from "react-native";
+import { Linking, Platform, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
 
 export default function MapScreen() {
@@ -29,7 +24,7 @@ export default function MapScreen() {
   const router = useRouter();
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="overflow-hidden flex-row justify-between items-center px-4 py-3 border-b-2 border-gray-200 bg-yellow-50">
         <View className="flex-row items-center gap-2">
           <TouchableOpacity
@@ -83,6 +78,6 @@ export default function MapScreen() {
           />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

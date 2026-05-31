@@ -70,6 +70,7 @@ function AndroidLayout({ isAdmin, saveCount }) {
           borderTopWidth: 1,
         },
         headerShown: false,
+        scrollEnabled: true,
       }}
     >
       <Tabs.Screen
