@@ -2,12 +2,12 @@ import { PropertyType, useSearchStore } from "@/store/searchStore";
 import { FontAwesome } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const TYPES: { label: string; value: PropertyType }[] = [
@@ -115,7 +115,7 @@ export default function FilterModal({
       </View>
 
       <ScrollView className="pt-5 pb-4 px-5 bg-gray-100">
-        <Text className="font-bold text-2xl font-black mt-4 mb-4">
+        <Text className="font-bold text-2xl text-black mt-4 mb-4">
           Property Types
         </Text>
         <View className="flex-row flex-wrap gap-5">
@@ -133,7 +133,7 @@ export default function FilterModal({
           ))}
         </View>
 
-        <Text className="font-bold text-2xl font-black mt-8 mb-4">
+        <Text className="font-bold text-2xl text-black mt-8 mb-4">
           Bedrooms
         </Text>
         <View className="flex-row flex-wrap gap-5">
@@ -151,7 +151,7 @@ export default function FilterModal({
           ))}
         </View>
 
-        <Text className="font-bold text-2xl font-black mt-8 mb-4">
+        <Text className="font-bold text-2xl text-black mt-8 mb-4">
           Price Range (PKR)
         </Text>
         <View className="flex-row flex-wrap gap-5">

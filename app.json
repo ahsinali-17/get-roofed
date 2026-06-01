@@ -47,6 +47,12 @@
           "photosPermission": "Allow real estate app to access your photos.",
           "cameraPermission": "Allow real estate app to use your camera."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow real estate app to access your location while you are using the app."
+        }
       ]
     ],
     "experiments": {

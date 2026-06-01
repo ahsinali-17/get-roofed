@@ -1,13 +1,13 @@
 import { useAuth, useUser } from "@clerk/expo";
 import { FontAwesome } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Linking,
-  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -21,6 +21,7 @@ export default function Profile() {
   const router = useRouter();
 
   const [updatingImage, setUpdatingImage] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -33,60 +34,47 @@ export default function Profile() {
 
   const handleProfilePicUpdate = async () => {
     try {
-      if (Platform.OS === "web") {
-        setUpdatingImage(true);
-        const input = document.createElement("input") as HTMLInputElement;
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = async (e) => {
-          try {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (file && user) {
-              await user.setProfileImage({ file });
-              await user.reload();
-              alert("Profile picture updated successfully!");
-            }
-          } catch (error) {
-            console.error("Error updating profile picture:", error);
-            alert("Failed to update profile picture");
-          } finally {
-            setUpdatingImage(false);
-          }
-        };
-        input.click();
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow access to your photo library to update your profile picture.",
+        );
+        return;
       }
-      //else{
-      // setUpdatingImage(true);
-      // const permissonResult =
-      //   await ImagePicker.requestMediaLibraryPermissionsAsync();
-      // if (permissonResult.granted === false) {
-      //   Alert.alert("Permission to access media library is required!");
-      //   setUpdatingImage(false);
-      //   return;
-      // }
-      // const pickerResult = await ImagePicker.launchImageLibraryAsync({
-      //   mediaTypes: "images",
-      //   allowsEditing: true,
-      //   aspect: [1, 1],
-      //   quality: 0.75,
-      //   base64: true,
-      // });
-      // if (pickerResult.canceled) {
-      //   setUpdatingImage(false);
-      //   return;
-      // }
-      // const selectedImage = pickerResult.assets[0].uri;
-      // const filename = selectedImage.split("/").pop() || "profile-pic.jpg";
-      // const response = await fetch(selectedImage);
-      // const blob = await response.blob();
-      // const file = new File([blob], filename, { type: "image/jpeg" });
-      // await user?.setProfileImage({ file });
-      // user?.reload();
-      //    Alert.alert("Profile picture updated successfully!");
-      //setUpdatingImage(false);
-      //}
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "images",
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (result.canceled) return;
+
+      setUpdatingImage(true);
+
+      const base64Image = result.assets[0].base64;
+      const uri = result.assets[0].uri;
+      const filename = uri.split("/").pop() || "profile.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const mimeType = match ? `image/${match[1]}` : "image/jpeg";
+      const dataUrl = `data:${mimeType};base64,${base64Image}`;
+
+      await user?.setProfileImage({ file: dataUrl });
+
+      Alert.alert("Success", "Profile picture updated successfully!");
+      user?.reload();
     } catch (error) {
-      console.error("Error updating profile picture:", error);
+      console.error("Error updating profile image:", error);
+      Alert.alert(
+        "Error",
+        "Failed to update profile picture. Please try again.",
+      );
+    } finally {
       setUpdatingImage(false);
     }
   };
@@ -104,15 +92,29 @@ export default function Profile() {
       <View className="flex-1 py-4 px-5">
         <Text className="font-bold text-xl text-black mb-1">Profile</Text>
 
-        <View className="mx-auto relative w-24 h-24 rounded-full ">
-          <Image
-            source={{ uri: user.imageUrl }}
-            className="w-full h-full rounded-full"
-            contentFit="cover"
-            contentPosition={"top"}
-          />
+        <View className="mx-auto relative w-36 h-36 rounded-full ">
+          {user.imageUrl && !imageError ? (
+            <Image
+              source={{ uri: user.imageUrl }}
+              style={{ width: 144, height: 144, borderRadius: 72 }}
+              contentFit="cover"
+              contentPosition="top"
+              onLoad={() => {
+                console.log("Image loaded successfully!");
+              }}
+              onError={(error) => {
+                console.log("Image failed to load. Error:", error);
+                console.log("Image URL:", user.imageUrl);
+                setImageError(true);
+              }}
+            />
+          ) : (
+            <View className="w-full h-full rounded-full bg-blue-300 justify-center items-center">
+              <FontAwesome name="user" size={48} color="#fff" />
+            </View>
+          )}
           <TouchableOpacity
-            className="absolute bottom-0 right-0 z-10 bg-blue-100 rounded-full p-2"
+            className="absolute -bottom-2 -right-2 z-10 bg-blue-100 rounded-full p-2"
             onPress={handleProfilePicUpdate}
             disabled={updatingImage}
           >
