@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "appVersionSource": "dynamic"
+  },
   "expo": {
     "name": "real_estate_project",
     "slug": "real_estate_project",
@@ -20,7 +23,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.real_estate_project"
+      "package": "com.anonymous.real_estate_project",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -53,11 +61,32 @@
         {
           "locationWhenInUsePermission": "Allow real estate app to access your location while you are using the app."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "packagingOptions": {
+              "pickFirsts": [
+                "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
+                "META-INF/**/MANIFEST.MF",
+                "META-INF/MANIFEST.MF"
+              ],
+              "excludes": ["META-INF/DEPENDENCIES"]
+            }
+          }
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8eba5494-1760-417d-bfa2-084ba1439555"
+      }
     }
   }
 }
