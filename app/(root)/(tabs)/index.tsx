@@ -70,8 +70,8 @@ export default function Home() {
             {/* Header */}
             <View className="flex-row justify-between items-center px-5 pt-4 pb-4">
               <Image
-                source={require("@/assets/images/kribb.png")}
-                style={{ width: 48, height: 36 }}
+                source={require("@/assets/images/icon.png")}
+                style={{ width: 64, height: 64 }}
                 resizeMode="contain"
               />
               <Text className="text-lg text-gray-600">

@@ -4,6 +4,7 @@
   },
   "expo": {
     "name": "Get-Roofed",
+    "description": "A real estate app.",
     "slug": "real_estate_project",
     "version": "1.0.0",
     "orientation": "portrait",

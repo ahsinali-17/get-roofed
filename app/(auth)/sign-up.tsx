@@ -68,7 +68,7 @@ export default function SignUp() {
       <SafeAreaView className="flex-1">
         <View className="flex-1 justify-center gap-3 px-6 py-12">
           <Image
-            source={require("../../assets/images/kribb.png")}
+            source={require("../../assets/images/icon.png")}
             resizeMode="contain"
             style={{
               width: 80,
@@ -134,7 +134,7 @@ export default function SignUp() {
       >
         <View className="flex-1 justify-center px-6 py-12">
           <Image
-            source={require("../../assets/images/kribb.png")}
+            source={require("../../assets/images/icon.png")}
             resizeMode="contain"
             style={{
               width: 80,

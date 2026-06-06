@@ -45,7 +45,7 @@ export default function PropertyCard({
         source={
           property.images.length > 0
             ? { uri: property.images[0] }
-            : require("../assets/images/kribb.png")
+            : require("../assets/images/icon.png")
         }
         className="w-28 h-full rounded-2xl"
         resizeMode="cover"

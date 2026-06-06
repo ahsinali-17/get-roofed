@@ -24,7 +24,7 @@ const FeaturedCard = ({ property }: { property: Property }) => {
         source={
           property.images.length > 0
             ? { uri: property.images[0] }
-            : require("../assets/images/kribb.png")
+            : require("../assets/images/icon.png")
         }
         className="w-full h-44"
         resizeMode="cover"
