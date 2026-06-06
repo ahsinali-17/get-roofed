@@ -3,14 +3,14 @@
     "appVersionSource": "dynamic"
   },
   "expo": {
-    "name": "real_estate_project",
+    "name": "Get-Roofed",
     "slug": "real_estate_project",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/kribb.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "realestateproject",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
@@ -24,6 +24,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.real_estate_project",
+      "enableProguardInReleaseBuilds": false,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -32,7 +33,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/kribb.png",
+      "favicon": "./assets/images/icon.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -40,7 +41,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/kribb.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
