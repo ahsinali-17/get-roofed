@@ -58,7 +58,7 @@ export default function PropertyDetails() {
 
   const handleContact = () => {
     const message = `Hello, I'm interested in the property "${property?.title}" located at ${property?.address}. Could you please provide more details?`;
-    const phoneNumber = process.env.PHONENUMBER || "+1234567890";
+    const phoneNumber = process.env.EXPO_PUBLIC_PHONENUMBER || "+1234567890";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
   };
