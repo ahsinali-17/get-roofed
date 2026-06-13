@@ -1,17 +1,17 @@
 {
-  "cli": {
-    "appVersionSource": "dynamic"
-  },
   "expo": {
     "name": "Get-Roofed",
     "description": "A real estate app.",
     "slug": "real_estate_project",
     "version": "1.0.0",
+    "cli": {
+      "appVersionSource": "dynamic"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "realestateproject",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
